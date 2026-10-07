@@ -237,7 +237,7 @@ const DirectoryScreen = ({ navigation }) => {
 
       {/* تنبيه */}
       <View style={styles.alert}>
-        <Ionicons name="shield-check" size={20} color={colors.primaryLight} />
+        <Ionicons name="shield-checkmark" size={20} color={colors.primaryLight} />
         <Text style={styles.alertText}>
           {t('directory.alert')}
         </Text>

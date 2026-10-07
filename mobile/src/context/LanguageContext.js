@@ -39,9 +39,22 @@ export const useLanguage = () => {
 };
 
 I18nManager.allowRTL(true);
+// فرض الاتجاه من أول تحميل بناءً على نظام الهاتف
+try {
+  const locs = getLocales();
+  const sysAr = locs && locs.length > 0 && locs[0].languageCode === 'ar';
+  if (I18nManager.isRTL !== sysAr) I18nManager.forceRTL(sysAr);
+} catch (e) {}
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguageState] = useState('ar');
+  const [language, setLanguageState] = useState(() => {
+    try {
+      const locs = getLocales();
+      return locs && locs.length > 0 && locs[0].languageCode === 'ar' ? 'ar' : 'en';
+    } catch (e) {
+      return 'ar';
+    }
+  });
 
   useEffect(() => {
     loadLanguage();
@@ -50,9 +63,12 @@ export const LanguageProvider = ({ children }) => {
   const loadLanguage = async () => {
     try {
       const stored = await AsyncStorage.getItem('language');
-      if (stored === 'ar' || stored === 'en') {
-        setLanguageState(stored);
-        setModuleLanguage(stored);
+      const lang = stored === 'ar' || stored === 'en' ? stored : null;
+      if (lang) {
+        setLanguageState(lang);
+        setModuleLanguage(lang);
+        const wantRTL = lang === 'ar';
+        if (I18nManager.isRTL !== wantRTL) I18nManager.forceRTL(wantRTL);
         return;
       }
       const locales = getLocales();
